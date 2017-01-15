@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css" />
+        <link rel="stylesheet" type="text/css" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/label.css" />
+        <link rel="stylesheet" href="css/MarkerCluster.css" />
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css" />
+        <script src="js/leaflet.js"></script>
+        <script src="js/OSMBuildings-Leaflet.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/label.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <style>
+        #map {
+            width: 1308px;
+            height: 670px;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="data/json_buildings0.js"></script>
+        <script src="data/json_paths1.js"></script>
+        <script src="data/json_places2.js"></script>
+        <p style="position: fixed; top: 0; right: 0;">Time axis: <input type="range" id="date" min="1975" max="2015"/><input id="datetxt"/></p><script src="http://code.jquery.com/jquery-1.11.1.min.js"></script><script>$(document).ready(function(){
+$('input').change(function(){
+$('#datetxt').val($('#date').val());
+setVisibility();
+});
+$('#datetxt').val($('#date').val());
+});
+        L.ImageOverlay.include({
+            getBounds: function () {
+                return this._bounds;
+            }
+        });
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.addAttribution('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a>');
+        var feature_group = new L.featureGroup([]);
+        var bounds_group = new L.featureGroup([]);
+        var raster_group = new L.LayerGroup([]);
+        var initialOrder = new Array();
+        var layerOrder = new Array();
+        function stackLayers() {
+            for (index = 0; index < initialOrder.length; index++) {
+                map.removeLayer(initialOrder[index]);
+                map.addLayer(initialOrder[index]);
+            }
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        function restackLayers() {
+            for (index = 0; index < layerOrder.length; index++) {
+                layerOrder[index].bringToFront();
+            }
+        }
+        layerControl = L.control.layers({},{},{collapsed:false});
+        function pop_buildings0(feature, layer) {
+            var popupContent = '<table><tr><th scope="row">id</th><td>' + (feature.properties['id'] !== null ? Autolinker.link(String(feature.properties['id'])) : '') + '</td></tr><tr><th scope="row">name</th><td>' + (feature.properties['name'] !== null ? Autolinker.link(String(feature.properties['name'])) : '') + '</td></tr><tr><th scope="row">year_from</th><td>' + (feature.properties['year_from'] !== null ? Autolinker.link(String(feature.properties['year_from'])) : '') + '</td></tr><tr><th scope="row">year_to</th><td>' + (feature.properties['year_to'] !== null ? Autolinker.link(String(feature.properties['year_to'])) : '') + '</td></tr></table>';
+            layer.bindPopup(popupContent);
+        }
+
+        function doStylebuildings0(feature) {
+
+            s =  {
+                weight: 1.04,
+                color: '#000000',
+                fillColor: '#4ad199',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                opacity: 1.0,
+                fillOpacity: 1.0
+            
+};if (feature.properties.year_from <= $('#date').val() && feature.properties.year_to >= $('#date').val()) {
+s['opacity'] = 1.0;
+s['fillOpacity'] = 1.0;
+} else {
+s['opacity'] = 0.0;
+s['fillOpacity'] = 0.0;
+}
+return s;
+}
+function setVisibilitybuildings0() {
+for (var row=0; row<1000; row++) {
+if ( typeof(json_buildings0JSON._layers[row])=='undefined') continue;
+  s = doStylebuildings0(json_buildings0JSON._layers[row].feature);
+  json_buildings0JSON._layers[row].setStyle(s);
+ }
+}
+
+        var json_buildings0JSON = new L.geoJson(json_buildings0, {
+            onEachFeature: pop_buildings0,
+            style: doStylebuildings0
+        });
+        layerOrder[layerOrder.length] = json_buildings0JSON;
+        bounds_group.addLayer(json_buildings0JSON);
+        initialOrder[initialOrder.length] = json_buildings0JSON;
+        feature_group.addLayer(json_buildings0JSON);
+        function pop_paths1(feature, layer) {
+            var popupContent = '<table><tr><th scope="row">id</th><td>' + (feature.properties['id'] !== null ? Autolinker.link(String(feature.properties['id'])) : '') + '</td></tr><tr><th scope="row">year_from</th><td>' + (feature.properties['year_from'] !== null ? Autolinker.link(String(feature.properties['year_from'])) : '') + '</td></tr><tr><th scope="row">year_to</th><td>' + (feature.properties['year_to'] !== null ? Autolinker.link(String(feature.properties['year_to'])) : '') + '</td></tr></table>';
+            layer.bindPopup(popupContent);
+        }
+
+        function doStylepaths1(feature) {
+
+            s =  {
+                weight: 1.04,
+                color: '#2b834a',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                opacity: 1.0
+            
+};if (feature.properties.year_from <= $('#date').val() && feature.properties.year_to >= $('#date').val()) {
+s['opacity'] = 1.0;
+s['fillOpacity'] = 1.0;
+} else {
+s['opacity'] = 0.0;
+s['fillOpacity'] = 0.0;
+}
+return s;
+}
+function setVisibilitypaths1() {
+for (var row=0; row<1000; row++) {
+if ( typeof(json_paths1JSON._layers[row])=='undefined') continue;
+  s = doStylepaths1(json_paths1JSON._layers[row].feature);
+  json_paths1JSON._layers[row].setStyle(s);
+ }
+}
+
+        var json_paths1JSON = new L.geoJson(json_paths1, {
+            onEachFeature: pop_paths1,
+            style: doStylepaths1
+        });
+        layerOrder[layerOrder.length] = json_paths1JSON;
+        bounds_group.addLayer(json_paths1JSON);
+        initialOrder[initialOrder.length] = json_paths1JSON;
+        feature_group.addLayer(json_paths1JSON);
+        function pop_places2(feature, layer) {
+            var popupContent = '<table><tr><th scope="row">id</th><td>' + (feature.properties['id'] !== null ? Autolinker.link(String(feature.properties['id'])) : '') + '</td></tr><tr><th scope="row">year_from</th><td>' + (feature.properties['year_from'] !== null ? Autolinker.link(String(feature.properties['year_from'])) : '') + '</td></tr><tr><th scope="row">year_to</th><td>' + (feature.properties['year_to'] !== null ? Autolinker.link(String(feature.properties['year_to'])) : '') + '</td></tr></table>';
+            layer.bindPopup(popupContent);
+        }
+
+        function doStyleplaces2(feature) {
+
+            s =  {
+                radius: 2.0,
+                fillColor: '#7ce6e1',
+                color: '#000000',
+                weight: 0.0,
+                opacity: 1.0,
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                fillOpacity: 1.0
+            
+};if (feature.properties.year_from <= $('#date').val() && feature.properties.year_to >= $('#date').val()) {
+s['opacity'] = 1.0;
+s['fillOpacity'] = 1.0;
+} else {
+s['opacity'] = 0.0;
+s['fillOpacity'] = 0.0;
+}
+return s;
+}
+function setVisibilityplaces2() {
+for (var row=0; row<1000; row++) {
+if ( typeof(json_places2JSON._layers[row])=='undefined') continue;
+  s = doStyleplaces2(json_places2JSON._layers[row].feature);
+  json_places2JSON._layers[row].setStyle(s);
+ }
+}
+
+        function doPointToLayerplaces2(feature, latlng) {
+            return L.circleMarker(latlng, doStyleplaces2(feature))
+        }
+        var json_places2JSON = new L.geoJson(json_places2, {
+            onEachFeature: pop_places2, 
+            pointToLayer: doPointToLayerplaces2
+            });
+        layerOrder[layerOrder.length] = json_places2JSON;
+
+        bounds_group.addLayer(json_places2JSON);
+        initialOrder[initialOrder.length] = json_places2JSON;
+        feature_group.addLayer(json_places2JSON);
+        raster_group.addTo(map);
+        feature_group.addTo(map);
+        function setVisibility() {
+setVisibilityplaces2();
+setVisibilitypaths1();
+setVisibilitybuildings0();
+}
+stackLayers();
+        map.on('overlayadd', restackLayers);
+        </script>
+    </body>
+</html>
