@@ -6,7 +6,7 @@ and add two lines of code to ui_maindialog.py
 
 A. in header 
 
-import ui_timedialog from ui_timedialog import Ui_TimeDialog #time
+from ui_timedialog import Ui_TimeDialog #time
 
 B. in setupUi place after 
 
