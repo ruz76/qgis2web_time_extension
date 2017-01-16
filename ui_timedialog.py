@@ -38,7 +38,6 @@ class Ui_TimeDialog(object):
     ## def setupUi(self, tabWidget, MainDialog):
         self.maindialog = MainDialog
         self.tab_3 = QtGui.QWidget()
-        self.tab_3.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);"))
         self.tab_3.setObjectName(_fromUtf8("tab_3"))
         self.tab3_Layout = QtGui.QVBoxLayout(self.tab_3)
         self.tab3_Layout.setObjectName(_fromUtf8("tab3_Layout"))
@@ -362,7 +361,6 @@ class Button(QtGui.QPushButton):
         return html
     
     def saveOLMap(self):
-        print "Not implemented yet"
         print "Save OL"
         dir = projectInstance.readEntry("qgis2web", "Export folder")[0]
         print dir

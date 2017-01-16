@@ -471,6 +471,8 @@
             <Deleteunusedfields type="int">0</Deleteunusedfields>
             <Template type="int">0</Template>
             <Addscalebar type="int">0</Addscalebar>
+            <Min type="int">1975</Min>
+            <Max type="int">2016</Max>
         </qgis2web>
         <PositionPrecision>
             <DecimalPlaces type="int">2</DecimalPlaces>
