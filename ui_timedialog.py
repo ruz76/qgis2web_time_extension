@@ -5,7 +5,6 @@ import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.QtWebKit import *
-from configparams import paramsOL, baselayers, specificParams, specificOptions
 import utils
 import resources_rc
 import os.path
@@ -54,7 +53,7 @@ class Ui_TimeDialog(object):
 
         self.populate_layers_and_groups(self)
 
-        self.btn = Button(tabWidget)
+        self.btn = Button(tabWidget, self)
         self.tab3_Layout.addWidget(self.btn)
 
         tabWidget.addTab(self.tab_3, _fromUtf8(""))
@@ -181,6 +180,7 @@ class TreeLayerItem2(QTreeWidgetItem):
             self.timeToCombo.highlighted.connect(self.clickCombo)
             self.timeToCombo.currentIndexChanged.connect(self.saveLayerTimeToComboSettings)
             tree.setItemWidget(self.timeToItem, 1, self.timeToCombo)
+            self.populateMinMax()
 
     @property
     def timefrom(self):
@@ -258,8 +258,9 @@ class TreeLayerItem2(QTreeWidgetItem):
         ## self.items["Time axis"]["Max"].lineedit.setText(str(max))
 
 class Button(QtGui.QPushButton):
-    def __init__(self, parent):
+    def __init__(self, parent, main):
         super(Button, self).__init__(parent)
+        self.main = main
         self.setAcceptDrops(True)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(
@@ -272,14 +273,18 @@ class Button(QtGui.QPushButton):
         self.clicked.connect(self.saveMap) #connect here!
         
     def saveMap(self):
-        if projectInstance.readEntry("qgis2web", "mapFormat")[0] == "Leaflet":
-            self.saveLeafletMap()
-        else:
+        #if projectInstance.readEntry("qgis2web", "mapFormat")[0] == "leaflet":
+        #    self.saveLeafletMap()
+        #else:
+        #    self.saveOLMap()
+        if self.main.maindialog.ol3.isChecked():
             self.saveOLMap()
+        else:
+            self.saveLeafletMap()
         
     def saveLeafletMap(self):
         print "Save leaflet"
-        dir = projectInstance.readEntry("qgis2web", "Export folder")[0]
+        dir = projectInstance.readEntry("qgis2web", "Exportfolder")[0]
         print dir
         root, dirs, files = os.walk(dir).next()
         latest_subdir = max((os.path.getctime(os.path.join(root, f)), f) for f in dirs)
@@ -292,9 +297,9 @@ class Button(QtGui.QPushButton):
         f.write(html)
         f.close()
     def addLeafletHeader(self, html):
-        min = projectInstance.readEntry("qgis2web", "Min")[0]
-        max = projectInstance.readEntry("qgis2web", "Max")[0]
-        header = '<p style="position: fixed; top: 0; right: 0;">Time axis: <input type="range" id="date" min="' + min + '" max="' + max + '"/><input id="datetxt"/></p>'
+        mintime = projectInstance.readEntry("qgis2web", "Min")[0]
+        maxtime = projectInstance.readEntry("qgis2web", "Max")[0]    
+        header = '<p style="position: fixed; top: 0; right: 0;">Time axis: <input type="range" id="date" min="' + mintime + '" max="' + maxtime + '"/><input id="datetxt"/></p>'
         header += '<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>'
         header += '<script>'
         header += "$(document).ready(function(){\n"
@@ -306,17 +311,19 @@ class Button(QtGui.QPushButton):
         header += "});"
         html = html.replace("<script>", header)
         return html
+
     def changeLeafletStyles(self, html):
         root_node = QgsProject.instance().layerTreeRoot()
         tree_layers = root_node.findLayers()
-        layerid = 0
+        layerid = len(tree_layers) - 1
         layernames = []
+	layers = []
         for tree_layer in tree_layers:
             layer = tree_layer.layer()
             if layer.type() == QgsMapLayer.VectorLayer:
                 if layer.customProperty("qgis2web/Time from") is not None and layer.customProperty("qgis2web/Time to") is not None and layer.customProperty("qgis2web/Time from") is not QPyNullVariant and layer.customProperty("qgis2web/Time to") is not QPyNullVariant:
-                    start = html.find("function doStyle" + layer.name())
-                    flen = len("function doStyle") + len(layer.name())
+                    start = html.find("function style_" + layer.name())
+                    flen = len("function style_") + len(layer.name())
                     layeridstr = html[start+flen:start+flen+1]
                     layernames.append(layer.name() + layeridstr)
                     start2 = html.find("{", start + 1)
@@ -324,7 +331,7 @@ class Button(QtGui.QPushButton):
                     style = html[start2+1:end]
                     style = style.replace("return", "s = ") + "\n};"
                     end = html.find("}", end + 1)
-                    style = "function doStyle" + layer.name() + layeridstr + "(feature) {" + "\n" + style
+                    style = "function style_" + layer.name() + layeridstr + "(feature) {" + "\n" + style
                     #print layer.customProperty("qgis2web/Time from")
                     field_from = layer.pendingFields()[int(layer.customProperty("qgis2web/Time from"))-1].name()
                     field_to = layer.pendingFields()[int(layer.customProperty("qgis2web/Time to"))-1].name()
@@ -340,9 +347,9 @@ class Button(QtGui.QPushButton):
                     style += "}\n"
                     style += "function setVisibility" + layer.name() + layeridstr + "() {\n"   
                     style += "for (var row=0; row<1000; row++) {\n"
-                    style += "if ( typeof(json_" + layer.name() + layeridstr + "JSON._layers[row])=='undefined') continue;\n"
-                    style += "  s = doStyle" + layer.name() + layeridstr + "(json_" + layer.name() + layeridstr + "JSON._layers[row].feature);\n"
-                    style += "  json_" + layer.name() + layeridstr + "JSON._layers[row].setStyle(s);\n"
+                    style += "if ( typeof(layer_" + layer.name() + layeridstr + "._layers[row])=='undefined') continue;\n"
+                    style += "  s = style_" + layer.name() + layeridstr + "(layer_" + layer.name() + layeridstr + "._layers[row].feature);\n"
+                    style += "  layer_" + layer.name() + layeridstr + "._layers[row].setStyle(s);\n"
                     style += " }\n"      
                     style += "}\n"
                     html = html[:start] + style + html[end+1:]
@@ -352,17 +359,22 @@ class Button(QtGui.QPushButton):
                         start = html.find("(", start + 1) 
                         start = html.find("(", start + 1)  
                         html = html[:start] + "(feature" + html[start+1:]        
-                layerid += 1
+                layerid -= 1
         fvisibility = "function setVisibility() {\n"
         for layername in layernames:
             fvisibility += "setVisibility" + layername + "();\n"
         fvisibility += "}\n"
-        html = html.replace("stackLayers();", fvisibility + "stackLayers();")
+        html = html.replace("setBounds();", fvisibility + "setBounds();")
         return html
     
     def saveOLMap(self):
         print "Save OL"
-        dir = projectInstance.readEntry("qgis2web", "Export folder")[0]
+        dir = projectInstance.readEntry("qgis2web", "Exportfolder")[0]
+        if dir == "":
+            if os.path.isdir("/tmp/qgis2web"):
+                dir = "/tmp/qgis2web"
+            if os.path.isdir("C:\\TEMP\\qgis2web"):
+                dir = "C:\\TEMP\\qgis2web"
         print dir
         root, dirs, files = os.walk(dir).next()
         latest_subdir = max((os.path.getctime(os.path.join(root, f)), f) for f in dirs)
@@ -403,13 +415,16 @@ class Button(QtGui.QPushButton):
     def changeOLStyles(self, path):
         root_node = QgsProject.instance().layerTreeRoot()
         tree_layers = root_node.findLayers()
-        layerid = 0
+        layerid = len(tree_layers) - 1
         layernames = []
+	#for count, (tree_layer) in enumerate(zip(tree_layers)):
+        #sln = safeName(layer.name()) + unicode(count)
+        #count = 0
         for tree_layer in tree_layers:
             layer = tree_layer.layer()
             if layer.type() == QgsMapLayer.VectorLayer:
                 if layer.customProperty("qgis2web/Time from") is not None and layer.customProperty("qgis2web/Time to") is not None and layer.customProperty("qgis2web/Time from") is not QPyNullVariant and layer.customProperty("qgis2web/Time to") is not QPyNullVariant:
-                    stylefile = os.path.join(path, layer.name() + "_style.js")
+                    stylefile = os.path.join(path, layer.name() + unicode(layerid) + "_style.js")
                     style = open(stylefile, 'r').read()
                     start = style.find("var style =")
                     end = style.find(";", start)
@@ -423,12 +438,12 @@ class Button(QtGui.QPushButton):
                     stylevis += styledef.replace("1.0", "0.0") + "\n"
                     stylevis += "}\n"
                     style = style[:end+1] + stylevis + style[end+2:]
-                    styletimefile = os.path.join(path, layer.name() + "_style_time.js")
+                    styletimefile = os.path.join(path, layer.name() + unicode(layerid) + "_style_time.js")
                     f = open(styletimefile, 'w')
                     f.write(style)
                     f.close()
-                    layernames.append(layer.name())
-                layerid += 1
+                    layernames.append(layer.name() + unicode(layerid))
+                layerid -= 1
         return layernames
     
     def changeAlpha(self, styledef):
