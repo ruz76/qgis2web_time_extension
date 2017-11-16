@@ -15,3 +15,9 @@ self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
 this line
 
 uitime = Ui_TimeDialog(self.tabWidget, MainDialog) #time
+
+This will place the Time Tab at the end of the list of tabs. 
+If you want to place it after tab Export than place the code 
+after self.tabWidget.addTab(self.tab, _fromUtf8("")).
+
+![Sample output](sample.png)
