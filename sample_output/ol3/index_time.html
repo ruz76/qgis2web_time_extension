@@ -1,17 +1,38 @@
 <!doctype html>
 <html lang="en">
     <head>
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script><script>$(document).ready(function(){
-$('input').change(function(){
-$('#datetxt').val($('#date').val());
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script>
+function getDateString(d) {
+m = d.getMonth() + 1;
+month = String('0' + m).slice(-2);
+day = String('0' + d.getDate()).slice(-2);
+return d.getFullYear() + '-' + month + '-' + day;
+}
+$(document).ready(function() {
+$( '#slider-range' ).slider({
+range: true,
+min: new Date('1975-01-01').getTime() / 1000,
+max: new Date('2016-01-01').getTime() / 1000,
+step: 86400,
+values: [ new Date('1975-01-01').getTime() / 1000, new Date('2016-01-01').getTime() / 1000 ],
+slide: function( event, ui ) {
+var from = new Date(ui.values[0] *1000);
+var to = new Date(ui.values[1] *1000);
+$( '#datefrom' ).val(getDateString(new Date(ui.values[0] *1000)));
+$( '#dateto' ).val(getDateString(new Date(ui.values[1] *1000)));
 setVisibility();
+}
 });
-$('#datetxt').val($('#date').val());
+var from = new Date($('#slider-range').slider('values', 0)*1000);
+var to = new Date($('#slider-range').slider('values', 1)*1000);
+$( '#datefrom' ).val(getDateString(from));
+$( '#dateto' ).val(getDateString(to));
 });
 function setVisibility() {
-lyr_places.getSource().changed();
-lyr_paths.getSource().changed();
-lyr_buildings.getSource().changed();
+lyr_places_2.getSource().changed();
+lyr_paths_1.getSource().changed();
+lyr_buildings_0.getSource().changed();
 }</script>
 
         <meta charset="utf-8">
@@ -19,7 +40,7 @@ lyr_buildings.getSource().changed();
         <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <link rel="stylesheet" href="./resources/ol.css" />
+        <link rel="stylesheet" href="./resources/ol.css">
         <link rel="stylesheet" href="./resources/ol3-layerswitcher.css">
         <link rel="stylesheet" href="./resources/qgis2web.css">
         <style>
@@ -27,17 +48,12 @@ lyr_buildings.getSource().changed();
             background-color: #ffffff;
         }
         </style>
-        <script src="resources/polyfills.js"></script>
-        <script src="./resources/ol.js"></script>
-        <script src="resources/OSMBuildings-OL3.js"></script>
-        <script src="./resources/ol3-layerswitcher.js"></script>
-        <script src="layers/buildings.js"></script><script src="layers/paths.js"></script><script src="layers/places.js"></script>
-        <script src="styles/buildings_style_time.js"></script><script src="styles/paths_style_time.js"></script><script src="styles/places_style_time.js"></script>
-        <script src="./layers/layers.js" type="text/javascript"></script> 
         <style>
-        #map {
-            width: 1308px;
-            height: 670px;
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
         }
         </style>
         <title></title>
@@ -49,7 +65,22 @@ lyr_buildings.getSource().changed();
                 <div id="popup-content"></div>
             </div>
         </div>
+        <script src="resources/qgis2web_expressions.js"></script>
+        <script src="resources/polyfills.js"></script>
+        <script src="./resources/rbush.min.js"></script>
+        <script src="./resources/labelgun.min.js"></script>
+        <script src="./resources/functions.js"></script>
+        <script src="./resources/ol.js"></script>
+        <script src="./resources/ol3-layerswitcher.js"></script>
+        <script src="layers/buildings_0.js"></script><script src="layers/paths_1.js"></script><script src="layers/places_2.js"></script>
+        <script src="styles/buildings_0_style_time.js"></script><script src="styles/paths_1_style_time.js"></script><script src="styles/places_2_style_time.js"></script>
+        <script src="./layers/layers.js" type="text/javascript"></script> 
         <script src="./resources/qgis2web.js"></script>
         <script src="./resources/Autolinker.min.js"></script>
-    <p style="position: fixed; top: 0; right: 0;">Time axis: <input type="range" id="date" min="1975" max="2016"/><input id="datetxt"/></p></body>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+<script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+<div style="position: fixed; top: 10px; left: 70px;"><div id="slider-range" style="width:300px"></div>
+<p><input id="datefrom"/>   <input id="dateto"/> </p>
+</div>
+
 </html>

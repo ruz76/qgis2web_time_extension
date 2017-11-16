@@ -231,6 +231,21 @@ class TreeLayerItem2(QTreeWidgetItem):
             
     #ruzicka
     #TODO
+    def dateToInt(self, datestr):
+        datestr = datestr.replace("-", "")
+        if datestr == "NULL":
+            datestr = "1000" #TODO work better with null dates
+        if len(datestr) == 4:
+            datestr = datestr + "0101"
+        if len(datestr) == 6:
+            datestr = datestr + "01"
+        return int(datestr)
+
+    def dateIntToString(self, dateint):
+        datestr = str(dateint)
+        dateout = datestr[0:4] + "-" + datestr[4:6] + "-" + datestr[6:8]
+        return dateout
+
     def populateMinMax(self):
         global projectInstance
         min = sys.maxint;
@@ -243,16 +258,16 @@ class TreeLayerItem2(QTreeWidgetItem):
                 if layer.customProperty("qgis2web/Time from") is not None and layer.customProperty("qgis2web/Time to") is not None and layer.customProperty("qgis2web/Time from") is not QPyNullVariant and layer.customProperty("qgis2web/Time to") is not QPyNullVariant:
                     for feat in layer.getFeatures():
                         attrs = feat.attributes()
-                        attr = int(attrs[int(layer.customProperty("qgis2web/Time from")) - 1])
+                        attr = self.dateToInt(str(attrs[int(layer.customProperty("qgis2web/Time from")) - 1]))
                         if attr < min:
                             min = attr
-                        attr2 = int(attrs[int(layer.customProperty("qgis2web/Time to")) - 1])
+                        attr2 = self.dateToInt(str(attrs[int(layer.customProperty("qgis2web/Time to")) - 1]))
                         if attr2 > max:
                             max = attr2
-        projectInstance.writeEntry("qgis2web", "Min", min)
-        projectInstance.writeEntry("qgis2web", "Max", max)
-        print min
-        print max
+        projectInstance.writeEntry("qgis2web", "Min", self.dateIntToString(min))
+        projectInstance.writeEntry("qgis2web", "Max", self.dateIntToString(max))
+        #print min
+        #print max
         #TODO add text boxes
         ## self.items["Time axis"]["Min"].lineedit.setText(str(min))
         ## self.items["Time axis"]["Max"].lineedit.setText(str(max))
@@ -281,6 +296,7 @@ class Button(QtGui.QPushButton):
             self.saveOLMap()
         else:
             self.saveLeafletMap()
+        QMessageBox.information(None, "INFO", "Time options were added to index_time.html file.") 
         
     def saveLeafletMap(self):
         print "Save leaflet"
@@ -298,17 +314,7 @@ class Button(QtGui.QPushButton):
         f.close()
     def addLeafletHeader(self, html):
         mintime = projectInstance.readEntry("qgis2web", "Min")[0]
-        maxtime = projectInstance.readEntry("qgis2web", "Max")[0]    
-        header = '<p style="position: fixed; top: 0; right: 0;">Time axis: <input type="range" id="date" min="' + mintime + '" max="' + maxtime + '"/><input id="datetxt"/></p>'
-        header += '<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>'
-        header += '<script>'
-        header += "$(document).ready(function(){\n"
-        header +=	"$('input').change(function(){\n"
-        header += "$('#datetxt').val($('#date').val());\n"
-        header += "setVisibility();\n"
-        header += "});\n"
-        header += "$('#datetxt').val($('#date').val());\n"
-        header += "});"
+        maxtime = projectInstance.readEntry("qgis2web", "Max")[0]
         
         header = '<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>\n'
         header += '<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />\n'
@@ -327,10 +333,10 @@ class Button(QtGui.QPushButton):
         header += "$(document).ready(function() {\n"
         header += "$( '#slider-range' ).slider({\n"
         header += "range: true,\n"
-        header += "min: new Date('1975-01-01').getTime() / 1000,\n"
-        header += "max: new Date('2017-01-01').getTime() / 1000,\n"
+        header += "min: new Date('" + mintime + "').getTime() / 1000,\n"
+        header += "max: new Date('" + maxtime + "').getTime() / 1000,\n"
         header += "step: 86400,\n"
-        header += "values: [ new Date('2011-01-01').getTime() / 1000, new Date('2013-02-01').getTime() / 1000 ],\n"
+        header += "values: [ new Date('" + mintime + "').getTime() / 1000, new Date('" + maxtime + "').getTime() / 1000 ],\n"
         header += "slide: function( event, ui ) {\n"
         header += "var from = new Date(ui.values[0] *1000);\n"
         header += "var to = new Date(ui.values[1] *1000);\n"
@@ -361,14 +367,14 @@ class Button(QtGui.QPushButton):
                 if layer.customProperty("qgis2web/Time from") is not None and layer.customProperty("qgis2web/Time to") is not None and layer.customProperty("qgis2web/Time from") is not QPyNullVariant and layer.customProperty("qgis2web/Time to") is not QPyNullVariant:
                     start = html.find("function style_" + layer.name())
                     flen = len("function style_") + len(layer.name())
-                    layeridstr = html[start+flen:start+flen+1]
+                    layeridstr = html[start+flen:start+flen+2]
                     layernames.append(layer.name() + layeridstr)
                     start2 = html.find("{", start + 1)
                     end = html.find("}", start + 1)
                     style = html[start2+1:end]
                     style = style.replace("return", "s = ") + "\n};"
                     end = html.find("}", end + 1)
-                    style = "function style_" + layer.name() + layeridstr + "(feature) {" + "\n" + style
+                    style = "function style_" + layer.name() + layeridstr + "_0(feature) {" + "\n" + style
                     #print layer.customProperty("qgis2web/Time from")
                     field_from = layer.pendingFields()[int(layer.customProperty("qgis2web/Time from"))-1].name()
                     field_to = layer.pendingFields()[int(layer.customProperty("qgis2web/Time to"))-1].name()
@@ -394,7 +400,7 @@ class Button(QtGui.QPushButton):
                     style += "function setVisibility" + layer.name() + layeridstr + "() {\n"   
                     style += "for (var row=0; row<1000; row++) {\n"
                     style += "if ( typeof(layer_" + layer.name() + layeridstr + "._layers[row])=='undefined') continue;\n"
-                    style += "  s = style_" + layer.name() + layeridstr + "(layer_" + layer.name() + layeridstr + "._layers[row].feature);\n"
+                    style += "  s = style_" + layer.name() + layeridstr + "_0(layer_" + layer.name() + layeridstr + "._layers[row].feature);\n"
                     style += "  layer_" + layer.name() + layeridstr + "._layers[row].setStyle(s);\n"
                     style += " }\n"      
                     style += "}\n"
@@ -452,10 +458,10 @@ class Button(QtGui.QPushButton):
         header += "$(document).ready(function() {\n"
         header += "$( '#slider-range' ).slider({\n"
         header += "range: true,\n"
-        header += "min: new Date('1975-01-01').getTime() / 1000,\n"
-        header += "max: new Date('2017-01-01').getTime() / 1000,\n"
+        header += "min: new Date('" + mintime + "').getTime() / 1000,\n"
+        header += "max: new Date('" + maxtime + "').getTime() / 1000,\n"
         header += "step: 86400,\n"
-        header += "values: [ new Date('2011-01-01').getTime() / 1000, new Date('2013-02-01').getTime() / 1000 ],\n"
+        header += "values: [ new Date('" + mintime + "').getTime() / 1000, new Date('" + maxtime + "').getTime() / 1000 ],\n"
         header += "slide: function( event, ui ) {\n"
         header += "var from = new Date(ui.values[0] *1000);\n"
         header += "var to = new Date(ui.values[1] *1000);\n"

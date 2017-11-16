@@ -20,4 +20,17 @@ th {
 }
 .leaflet-container {
     background: #fff;
+    padding-right: 10px;
+}
+.leaflet-popup-content {
+    width:auto !important;
+    padding-right:10px;
+}
+.leaflet-tooltip {
+    background: none;
+    box-shadow: none;
+    border: none;
+}
+.leaflet-tooltip-left:before, .leaflet-tooltip-right:before {
+    border: 0px;
 }

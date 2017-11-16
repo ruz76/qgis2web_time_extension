@@ -6,21 +6,14 @@
         <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <link rel="stylesheet" href="css/leaflet.css" />
-        <link rel="stylesheet" type="text/css" href="css/qgis2web.css">
-        <link rel="stylesheet" href="css/label.css" />
-        <link rel="stylesheet" href="css/MarkerCluster.css" />
-        <link rel="stylesheet" href="css/MarkerCluster.Default.css" />
-        <script src="js/leaflet.js"></script>
-        <script src="js/OSMBuildings-Leaflet.js"></script>
-        <script src="js/leaflet-hash.js"></script>
-        <script src="js/label.js"></script>
-        <script src="js/Autolinker.min.js"></script>
-        <script src="js/leaflet.markercluster.js"></script>
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
         <style>
-        #map {
-            width: 1308px;
-            height: 670px;
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
         }
         </style>
         <title></title>
@@ -28,122 +21,154 @@
     <body>
         <div id="map">
         </div>
-        <script src="data/json_buildings0.js"></script>
-        <script src="data/json_paths1.js"></script>
-        <script src="data/json_places2.js"></script>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="data/buildings_0.js"></script>
+        <script src="data/paths_1.js"></script>
+        <script src="data/places_2.js"></script>
         <script>
-        L.ImageOverlay.include({
-            getBounds: function () {
-                return this._bounds;
-            }
-        });
         var map = L.map('map', {
-            zoomControl:true, maxZoom:28, minZoom:1
-        })
+            zoomControl:true, maxZoom:27, minZoom:1
+        }).fitBounds([[49.8301079863,18.142808173],[49.8459566093,18.1670407544]]);
         var hash = new L.Hash(map);
         map.attributionControl.addAttribution('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a>');
-        var feature_group = new L.featureGroup([]);
         var bounds_group = new L.featureGroup([]);
-        var raster_group = new L.LayerGroup([]);
-        var initialOrder = new Array();
-        var layerOrder = new Array();
-        function stackLayers() {
-            for (index = 0; index < initialOrder.length; index++) {
-                map.removeLayer(initialOrder[index]);
-                map.addLayer(initialOrder[index]);
-            }
-            if (bounds_group.getLayers().length) {
-                map.fitBounds(bounds_group.getBounds());
-            }
+        function setBounds() {
         }
-        function restackLayers() {
-            for (index = 0; index < layerOrder.length; index++) {
-                layerOrder[index].bringToFront();
-            }
-        }
-        layerControl = L.control.layers({},{},{collapsed:false});
-        function pop_buildings0(feature, layer) {
-            var popupContent = '<table><tr><th scope="row">id</th><td>' + (feature.properties['id'] !== null ? Autolinker.link(String(feature.properties['id'])) : '') + '</td></tr><tr><th scope="row">name</th><td>' + (feature.properties['name'] !== null ? Autolinker.link(String(feature.properties['name'])) : '') + '</td></tr><tr><th scope="row">year_from</th><td>' + (feature.properties['year_from'] !== null ? Autolinker.link(String(feature.properties['year_from'])) : '') + '</td></tr><tr><th scope="row">year_to</th><td>' + (feature.properties['year_to'] !== null ? Autolinker.link(String(feature.properties['year_to'])) : '') + '</td></tr></table>';
-            layer.bindPopup(popupContent);
+        function pop_buildings_0(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id'] !== null ? Autolinker.link(String(feature.properties['id'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['name'] !== null ? Autolinker.link(String(feature.properties['name'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['year_from'] !== null ? Autolinker.link(String(feature.properties['year_from'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['year_to'] !== null ? Autolinker.link(String(feature.properties['year_to'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
         }
 
-        function doStylebuildings0(feature) {
+        function style_buildings_0_0() {
             return {
-                weight: 1.04,
-                color: '#000000',
-                fillColor: '#4ad199',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                opacity: 1.0,
-                fillOpacity: 1.0
-            };
-        }
-        var json_buildings0JSON = new L.geoJson(json_buildings0, {
-            onEachFeature: pop_buildings0,
-            style: doStylebuildings0
-        });
-        layerOrder[layerOrder.length] = json_buildings0JSON;
-        bounds_group.addLayer(json_buildings0JSON);
-        initialOrder[initialOrder.length] = json_buildings0JSON;
-        feature_group.addLayer(json_buildings0JSON);
-        function pop_paths1(feature, layer) {
-            var popupContent = '<table><tr><th scope="row">id</th><td>' + (feature.properties['id'] !== null ? Autolinker.link(String(feature.properties['id'])) : '') + '</td></tr><tr><th scope="row">year_from</th><td>' + (feature.properties['year_from'] !== null ? Autolinker.link(String(feature.properties['year_from'])) : '') + '</td></tr><tr><th scope="row">year_to</th><td>' + (feature.properties['year_to'] !== null ? Autolinker.link(String(feature.properties['year_to'])) : '') + '</td></tr></table>';
-            layer.bindPopup(popupContent);
-        }
-
-        function doStylepaths1(feature) {
-            return {
-                weight: 1.04,
-                color: '#2b834a',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                opacity: 1.0
-            };
-        }
-        var json_paths1JSON = new L.geoJson(json_paths1, {
-            onEachFeature: pop_paths1,
-            style: doStylepaths1
-        });
-        layerOrder[layerOrder.length] = json_paths1JSON;
-        bounds_group.addLayer(json_paths1JSON);
-        initialOrder[initialOrder.length] = json_paths1JSON;
-        feature_group.addLayer(json_paths1JSON);
-        function pop_places2(feature, layer) {
-            var popupContent = '<table><tr><th scope="row">id</th><td>' + (feature.properties['id'] !== null ? Autolinker.link(String(feature.properties['id'])) : '') + '</td></tr><tr><th scope="row">year_from</th><td>' + (feature.properties['year_from'] !== null ? Autolinker.link(String(feature.properties['year_from'])) : '') + '</td></tr><tr><th scope="row">year_to</th><td>' + (feature.properties['year_to'] !== null ? Autolinker.link(String(feature.properties['year_to'])) : '') + '</td></tr></table>';
-            layer.bindPopup(popupContent);
-        }
-
-        function doStyleplaces2() {
-            return {
-                radius: 2.0,
-                fillColor: '#7ce6e1',
-                color: '#000000',
-                weight: 0.0,
-                opacity: 1.0,
+                pane: 'pane_buildings_0',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
                 dashArray: '',
                 lineCap: 'butt',
                 lineJoin: 'miter',
-                fillOpacity: 1.0
+                weight: 1.0, 
+                fillOpacity: 1,
+                fillColor: 'rgba(74,209,153,1.0)',
             }
         }
-        function doPointToLayerplaces2(feature, latlng) {
-            return L.circleMarker(latlng, doStyleplaces2())
+        map.createPane('pane_buildings_0');
+        map.getPane('pane_buildings_0').style.zIndex = 400;
+        map.getPane('pane_buildings_0').style['mix-blend-mode'] = 'normal';
+        var layer_buildings_0 = new L.geoJson(json_buildings_0, {
+            attribution: '<a href=""></a>',
+            pane: 'pane_buildings_0',
+            onEachFeature: pop_buildings_0,
+            style: style_buildings_0_0,
+        });
+        bounds_group.addLayer(layer_buildings_0);
+        map.addLayer(layer_buildings_0);
+        function pop_paths_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id'] !== null ? Autolinker.link(String(feature.properties['id'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['year_from'] !== null ? Autolinker.link(String(feature.properties['year_from'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['year_to'] !== null ? Autolinker.link(String(feature.properties['year_to'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
         }
-        var json_places2JSON = new L.geoJson(json_places2, {
-            onEachFeature: pop_places2, 
-            pointToLayer: doPointToLayerplaces2
-            });
-        layerOrder[layerOrder.length] = json_places2JSON;
 
-        bounds_group.addLayer(json_places2JSON);
-        initialOrder[initialOrder.length] = json_places2JSON;
-        feature_group.addLayer(json_places2JSON);
-        raster_group.addTo(map);
-        feature_group.addTo(map);
-        stackLayers();
-        map.on('overlayadd', restackLayers);
+        function style_paths_1_0() {
+            return {
+                pane: 'pane_paths_1',
+                opacity: 1,
+                color: 'rgba(43,131,74,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+            }
+        }
+        map.createPane('pane_paths_1');
+        map.getPane('pane_paths_1').style.zIndex = 401;
+        map.getPane('pane_paths_1').style['mix-blend-mode'] = 'normal';
+        var layer_paths_1 = new L.geoJson(json_paths_1, {
+            attribution: '<a href=""></a>',
+            pane: 'pane_paths_1',
+            onEachFeature: pop_paths_1,
+            style: style_paths_1_0,
+        });
+        bounds_group.addLayer(layer_paths_1);
+        map.addLayer(layer_paths_1);
+        function pop_places_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id'] !== null ? Autolinker.link(String(feature.properties['id'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['year_from'] !== null ? Autolinker.link(String(feature.properties['year_from'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['year_to'] !== null ? Autolinker.link(String(feature.properties['year_to'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_places_2_0() {
+            return {
+                pane: 'pane_places_2',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fillOpacity: 1,
+                fillColor: 'rgba(124,230,225,1.0)',
+            }
+        }
+        map.createPane('pane_places_2');
+        map.getPane('pane_places_2').style.zIndex = 402;
+        map.getPane('pane_places_2').style['mix-blend-mode'] = 'normal';
+        var layer_places_2 = new L.geoJson(json_places_2, {
+            attribution: '<a href=""></a>',
+            pane: 'pane_places_2',
+            onEachFeature: pop_places_2,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_places_2_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_places_2);
+        map.addLayer(layer_places_2);
+        setBounds();
         </script>
     </body>
 </html>
