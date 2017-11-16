@@ -110,6 +110,18 @@
         <edittype widgetv2type="TextEdit" name="year_to">
           <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
         </edittype>
+        <edittype widgetv2type="TextEdit" name="month_from">
+          <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+        </edittype>
+        <edittype widgetv2type="TextEdit" name="month_to">
+          <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+        </edittype>
+        <edittype widgetv2type="TextEdit" name="day_from">
+          <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+        </edittype>
+        <edittype widgetv2type="TextEdit" name="day_to">
+          <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+        </edittype>
       </edittypes>
       <renderer-v2 forceraster="0" symbollevels="0" type="singleSymbol" enableorderby="0">
         <symbols>
@@ -135,8 +147,17 @@
       <labeling type="simple"/>
       <customproperties>
         <property key="qgis2web/Info popup content" value="1"/>
-        <property key="qgis2web/Time from" value="3"/>
-        <property key="qgis2web/Time to" value="4"/>
+        <property key="qgis2web/Time from" value="7"/>
+        <property key="qgis2web/Time to" value="8"/>
+        <property key="qgis2web/Visible" value="true"/>
+        <property key="qgis2web/popup/day_from" value="no label"/>
+        <property key="qgis2web/popup/day_to" value="no label"/>
+        <property key="qgis2web/popup/id" value="no label"/>
+        <property key="qgis2web/popup/month_from" value="no label"/>
+        <property key="qgis2web/popup/month_to" value="no label"/>
+        <property key="qgis2web/popup/name" value="no label"/>
+        <property key="qgis2web/popup/year_from" value="no label"/>
+        <property key="qgis2web/popup/year_to" value="no label"/>
       </customproperties>
       <blendMode>0</blendMode>
       <featureBlendMode>0</featureBlendMode>
@@ -170,7 +191,7 @@
       <editform>.</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
-      <editforminitfilepath></editforminitfilepath>
+      <editforminitfilepath>.</editforminitfilepath>
       <editforminitcode><![CDATA[]]></editforminitcode>
       <featformsuppress>0</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
@@ -254,6 +275,10 @@
         <property key="qgis2web/Info popup content" value="1"/>
         <property key="qgis2web/Time from" value="2"/>
         <property key="qgis2web/Time to" value="3"/>
+        <property key="qgis2web/Visible" value="true"/>
+        <property key="qgis2web/popup/id" value="no label"/>
+        <property key="qgis2web/popup/year_from" value="no label"/>
+        <property key="qgis2web/popup/year_to" value="no label"/>
       </customproperties>
       <blendMode>0</blendMode>
       <featureBlendMode>0</featureBlendMode>
@@ -287,7 +312,7 @@
       <editform>.</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
-      <editforminitfilepath></editforminitfilepath>
+      <editforminitfilepath>.</editforminitfilepath>
       <editforminitcode><![CDATA[]]></editforminitcode>
       <featformsuppress>0</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
@@ -373,6 +398,10 @@
         <property key="qgis2web/Info popup content" value="1"/>
         <property key="qgis2web/Time from" value="3"/>
         <property key="qgis2web/Time to" value="2"/>
+        <property key="qgis2web/Visible" value="true"/>
+        <property key="qgis2web/popup/id" value="no label"/>
+        <property key="qgis2web/popup/year_from" value="no label"/>
+        <property key="qgis2web/popup/year_to" value="no label"/>
       </customproperties>
       <blendMode>0</blendMode>
       <featureBlendMode>0</featureBlendMode>
@@ -406,7 +435,7 @@
       <editform>.</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
-      <editforminitfilepath></editforminitfilepath>
+      <editforminitfilepath>.</editforminitfilepath>
       <editforminitcode><![CDATA[]]></editforminitcode>
       <featformsuppress>0</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
@@ -472,24 +501,29 @@
       </LayerSnappingToleranceList>
     </Digitizing>
     <qgis2web>
-      <MinifyGeoJSONfiles type="int">0</MinifyGeoJSONfiles>
-      <Showpopupsonhover type="int">0</Showpopupsonhover>
-      <Minzoomlevel type="int">0</Minzoomlevel>
+      <Maxzoomlevel type="QString">27</Maxzoomlevel>
+      <Showpopupsonhover type="bool">false</Showpopupsonhover>
       <Basemaps type="QString"></Basemaps>
-      <Measuretool type="int">0</Measuretool>
-      <Precision type="int">5</Precision>
-      <Addlayerslist type="int">0</Addlayerslist>
       <Exportfolder type="QString">/tmp/qgis2web</Exportfolder>
-      <Mappinglibrarylocation type="int">0</Mappinglibrarylocation>
-      <Geolocateuser type="int">0</Geolocateuser>
-      <Restricttoextent type="int">0</Restricttoextent>
-      <Addaddresssearch type="int">0</Addaddresssearch>
-      <Maxzoomlevel type="int">27</Maxzoomlevel>
-      <Highlightonhover type="int">0</Highlightonhover>
-      <MatchprojectCRS type="int">0</MatchprojectCRS>
-      <Extent type="int">1</Extent>
-      <Template type="int">0</Template>
-      <Addscalebar type="int">0</Addscalebar>
+      <mapFormat type="QString">openlayers</mapFormat>
+      <Precision type="QString">5</Precision>
+      <Measuretool type="QString">None</Measuretool>
+      <Usedebuglibraries type="bool">false</Usedebuglibraries>
+      <Baselayer type="QStringList"/>
+      <Addlayerslist type="QString">None</Addlayerslist>
+      <MatchprojectCRS type="bool">false</MatchprojectCRS>
+      <Highlightonhover type="bool">false</Highlightonhover>
+      <Addaddresssearch type="bool">false</Addaddresssearch>
+      <Minzoomlevel type="QString">1</Minzoomlevel>
+      <Geolocateuser type="bool">false</Geolocateuser>
+      <Exporter type="QString">folder</Exporter>
+      <MinifyGeoJSONfiles type="bool">false</MinifyGeoJSONfiles>
+      <Extent type="QString">Canvas extent</Extent>
+      <Restricttoextent type="bool">false</Restricttoextent>
+      <Template type="QString">canvas-size</Template>
+      <Mappinglibrarylocation type="QString">Local</Mappinglibrarylocation>
+      <Searchlayer type="QString"></Searchlayer>
+      <Layersearch type="QString">None</Layersearch>
     </qgis2web>
     <PositionPrecision>
       <DecimalPlaces type="int">2</DecimalPlaces>
