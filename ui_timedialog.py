@@ -9,6 +9,7 @@ import utils
 import resources_rc
 import os.path
 from qgis.core import *
+import PyQt4.QtCore
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -258,10 +259,22 @@ class TreeLayerItem2(QTreeWidgetItem):
                 if layer.customProperty("qgis2web/Time from") is not None and layer.customProperty("qgis2web/Time to") is not None and layer.customProperty("qgis2web/Time from") is not QPyNullVariant and layer.customProperty("qgis2web/Time to") is not QPyNullVariant:
                     for feat in layer.getFeatures():
                         attrs = feat.attributes()
-                        attr = self.dateToInt(str(attrs[int(layer.customProperty("qgis2web/Time from")) - 1]))
+                        attr_orig = attrs[int(layer.customProperty("qgis2web/Time from")) - 1]
+                        if type(attr_orig) is PyQt4.QtCore.QDate:
+                            attr_orig = attr_orig.toString('yyyy-MM-dd')
+                        else:
+                            attr_orig = str(attr_orig)
+                        #attr = self.dateToInt(str(attrs[int(layer.customProperty("qgis2web/Time from")) - 1]))
+                        attr = self.dateToInt(attr_orig)
                         if attr < min:
                             min = attr
-                        attr2 = self.dateToInt(str(attrs[int(layer.customProperty("qgis2web/Time to")) - 1]))
+                        attr2_orig = attrs[int(layer.customProperty("qgis2web/Time to")) - 1]
+                        if type(attr2_orig) is PyQt4.QtCore.QDate:
+                            attr2_orig = attr2_orig.toString('yyyy-MM-dd')
+                        else:
+                            attr2_orig = str(attr2_orig)
+                        #attr2 = self.dateToInt(str(attrs[int(layer.customProperty("qgis2web/Time to")) - 1]))
+                        attr2 = self.dateToInt(attr2_orig)
                         if attr2 > max:
                             max = attr2
         projectInstance.writeEntry("qgis2web", "Min", self.dateIntToString(min))
