@@ -54,6 +54,12 @@ class Ui_TimeDialog(object):
 
         self.populate_layers_and_groups(self)
 
+        self.chkRange = QtGui.QCheckBox(self.tab_3)
+        self.chkRange.setObjectName(_fromUtf8("chkRange"))
+        self.chkRange.setText(QtGui.QApplication.translate(
+            "MainDialog", "Slider Range", None, QtGui.QApplication.UnicodeUTF8))
+        self.tab3_Layout.addWidget(self.chkRange)
+
         self.btn = Button(tabWidget, self)
         self.tab3_Layout.addWidget(self.btn)
 
@@ -345,7 +351,10 @@ class Button(QtGui.QPushButton):
         header += "}\n"
         header += "$(document).ready(function() {\n"
         header += "$( '#slider-range' ).slider({\n"
-        header += "range: true,\n"
+        if not self.main.chkRange.isChecked():
+            header += "range: false,\n"
+        else:
+            header += "range: true,\n"
         header += "min: new Date('" + mintime + "').getTime() / 1000,\n"
         header += "max: new Date('" + maxtime + "').getTime() / 1000,\n"
         header += "step: 86400,\n"
@@ -354,7 +363,10 @@ class Button(QtGui.QPushButton):
         header += "var from = new Date(ui.values[0] *1000);\n"
         header += "var to = new Date(ui.values[1] *1000);\n"
         header += "$( '#datefrom' ).val(getDateString(new Date(ui.values[0] *1000)));\n"
-        header += "$( '#dateto' ).val(getDateString(new Date(ui.values[1] *1000)));\n"
+        if not self.main.chkRange.isChecked():
+            header += "$( '#dateto' ).val(getDateString(new Date(ui.values[0] *1000)));\n"
+        else:
+            header += "$( '#dateto' ).val(getDateString(new Date(ui.values[1] *1000)));\n"
         header += "setVisibility();\n"
         header += "}\n"
         header += "});\n"
@@ -470,7 +482,10 @@ class Button(QtGui.QPushButton):
 
         header += "$(document).ready(function() {\n"
         header += "$( '#slider-range' ).slider({\n"
-        header += "range: true,\n"
+        if not self.main.chkRange.isChecked():
+            header += "range: false,\n"
+        else:
+            header += "range: true,\n"
         header += "min: new Date('" + mintime + "').getTime() / 1000,\n"
         header += "max: new Date('" + maxtime + "').getTime() / 1000,\n"
         header += "step: 86400,\n"
@@ -479,7 +494,10 @@ class Button(QtGui.QPushButton):
         header += "var from = new Date(ui.values[0] *1000);\n"
         header += "var to = new Date(ui.values[1] *1000);\n"
         header += "$( '#datefrom' ).val(getDateString(new Date(ui.values[0] *1000)));\n"
-        header += "$( '#dateto' ).val(getDateString(new Date(ui.values[1] *1000)));\n"
+        if not self.main.chkRange.isChecked():
+            header += "$( '#dateto' ).val(getDateString(new Date(ui.values[0] *1000)));\n"
+        else:
+            header += "$( '#dateto' ).val(getDateString(new Date(ui.values[1] *1000)));\n"
         header += "setVisibility();\n"
         header += "}\n"
         header += "});\n"
